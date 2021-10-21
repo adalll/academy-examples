@@ -1,0 +1,32 @@
+# ------------------------------------------------------
+# THIS FILE WAS AUTOMATICALLY GENERATED (DO NOT MODIFY)
+# ------------------------------------------------------
+
+type User {
+  email: String!
+}
+
+type Auth {
+  accessToken: String!
+  tokenType: String!
+  expiresIn: Float!
+  refreshToken: String!
+  idToken: String
+}
+
+type Query {
+  """Returns pong"""
+  ping: String!
+  signIn(input: CreateUserInput!): Auth!
+}
+
+input CreateUserInput {
+  email: String!
+  password: String!
+}
+
+type Mutation {
+  signUp(input: CreateUserInput!): User!
+  protectedMethod: String!
+  refreshToken(accessToken: String!, refreshToken: String!): Auth!
+}

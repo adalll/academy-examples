@@ -20,13 +20,14 @@ export const typeOrmConfig: TypeOrmModuleAsyncOptions = {
 
         return {
             type: 'postgres',
-            entities: [__dirname + '/../**/*.entity{.ts,.js}'],
+            entities: ['dist/**/*.entity.{ts,js}'],
             database,
             host: configService.get('PSQL_HOST') || DEFAULT_PSQL_HOST,
             port: configService.get('PSQL_PORT') || DEFAULT_PSQL_PORT,
             username: configService.get('PSQL_USERNAME'),
             password: configService.get('PSQL_PASSWORD'),
-            synchronize: false,
+            synchronize: true,
+            dropSchema: true,
         }
     },
     inject: [ConfigService],
