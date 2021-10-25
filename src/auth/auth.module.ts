@@ -1,4 +1,4 @@
-import { HttpModule, Module } from '@nestjs/common'
+import { forwardRef, HttpModule, Module } from '@nestjs/common'
 import { TypeOrmModule } from '@nestjs/typeorm'
 import { ConfigService } from '@nestjs/config'
 
@@ -13,6 +13,7 @@ import { RefreshTokenEntity } from '../users/entities/refresh-token.entity'
         UsersModule,
         ConfigService,
         TypeOrmModule.forFeature([RefreshTokenEntity]),
+        forwardRef(() => UsersModule),
     ],
     providers: [AuthService, AuthResolver],
     exports: [AuthService],

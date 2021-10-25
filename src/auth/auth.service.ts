@@ -1,4 +1,10 @@
-import { HttpService, Injectable, Logger } from '@nestjs/common'
+import {
+    forwardRef,
+    HttpService,
+    Inject,
+    Injectable,
+    Logger,
+} from '@nestjs/common'
 import { ConfigService } from '@nestjs/config'
 import { InjectRepository } from '@nestjs/typeorm'
 import { Repository } from 'typeorm'
@@ -8,7 +14,7 @@ import * as moment from 'moment'
 import { v4 as Uuidv4 } from 'uuid'
 import * as fs from 'fs'
 
-import { CreateUserDto } from '../users/dtos/create-user.dto'
+import { UserDto } from '../users/dtos/user.dto'
 import { UserEntity } from '../users/entities/user.entity'
 import { UsersService } from '../users/users.service'
 import { AuthType } from './graphql/types/auth.type'
@@ -17,6 +23,11 @@ import { RoleEnum } from '../users/graphql/enums/role.enum'
 import { RefreshTokenEntity } from '../users/entities/refresh-token.entity'
 
 const DEFAULT_ACCESS_TOKEN_TTL = 600
+
+/** Команды для генерирования ключей, ключи нужно закинуть в папку assets
+ * ssh-keygen -t rsa -b 4096 -m PEM -f private.key
+ * openssl rsa -in private.key -pubout -outform PEM -out public.key
+ * **/
 
 @Injectable()
 export class AuthService {
@@ -33,6 +44,7 @@ export class AuthService {
     constructor(
         private readonly _configService: ConfigService,
         private readonly _httpService: HttpService,
+        @Inject(forwardRef(() => UsersService))
         private readonly _usersService: UsersService,
         @InjectRepository(RefreshTokenEntity)
         private readonly _refreshTokenRepository: Repository<RefreshTokenEntity>,
@@ -54,11 +66,6 @@ export class AuthService {
             `${process.cwd()}/assets/public.key`,
         )
 
-        /**
-         * ssh-keygen -t rsa -b 4096 -m PEM -f private.key
-         * openssl rsa -in private.key -pubout -outform PEM -out public.key
-         * **/
-
         this._tokenType = this._configService.get<string>(
             'TOKEN_TYPE',
             'Bearer',
@@ -70,13 +77,13 @@ export class AuthService {
         )
     }
 
-    async signUp(input: CreateUserDto): Promise<UserEntity> {
+    async signUp(input: UserDto): Promise<UserEntity> {
         const user = await this._usersService.createUser(input)
 
         return user
     }
 
-    async signIn(input: CreateUserDto): Promise<AuthType> {
+    async signIn(input: UserDto): Promise<AuthType> {
         const loginResults = await this._usersService.login(input)
         if (!loginResults) {
             throw new Error('Forbidden login')

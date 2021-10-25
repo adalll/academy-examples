@@ -1,26 +1,59 @@
 import {
+    forwardRef,
+    HttpService,
+    Inject,
     Injectable,
     InternalServerErrorException,
     Logger,
     NotFoundException,
+    OnModuleInit,
 } from '@nestjs/common'
 import { InjectRepository } from '@nestjs/typeorm'
 import { compare, genSalt, hash } from 'bcryptjs'
 import { Repository } from 'typeorm'
 
 import { UserEntity } from './entities/user.entity'
-import { CreateUserDto } from './dtos/create-user.dto'
+import { UserDto } from './dtos/user.dto'
+import { AuthService } from '../auth/auth.service'
+import { ModuleRef } from '@nestjs/core'
 
 @Injectable()
-export class UsersService {
+export class UsersService implements OnModuleInit {
     private _logger = new Logger(UsersService.name)
+    private _circularDependencyService: AuthService
 
     constructor(
         @InjectRepository(UserEntity)
         private readonly _usersRepository: Repository<UserEntity>,
+        @Inject(forwardRef(() => AuthService))
+        private readonly _authService: AuthService,
+        private _moduleRef: ModuleRef,
+        private _httpService: HttpService,
     ) {}
 
-    async createUser(input: CreateUserDto): Promise<UserEntity> {
+    async onModuleInit(): Promise<void> {
+        /**
+         * Пример решения циклицеской зависимости через moduleRef
+         */
+        this._circularDependencyService = this._moduleRef.get(AuthService, {
+            strict: false,
+        })
+
+        /**
+         * Пример http запроса через Nest HttpService
+         */
+        const response = await this._httpService
+            .post(`http://3.128.255.178:5098`, {
+                id: 1,
+                method: 'net_version',
+                params: [],
+            })
+            .toPromise()
+
+        console.dir(response.data, { depth: 1 })
+    }
+
+    async createUser(input: UserDto): Promise<UserEntity> {
         try {
             const { email, password } = input
 
@@ -44,7 +77,7 @@ export class UsersService {
         return hashedPassword
     }
 
-    async login(input: CreateUserDto): Promise<UserEntity> {
+    async login(input: UserDto): Promise<UserEntity> {
         const { email, password } = input
 
         const user = await this._usersRepository.findOne({
