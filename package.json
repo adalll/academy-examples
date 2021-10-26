@@ -29,7 +29,6 @@
         "migration:revert": "npm run typeorm:cli -- migration:revert"
     },
     "dependencies": {
-        "@i-link/common": "^2.0.1",
         "@nestjs/common": "^7.0.0",
         "@nestjs/config": "^0.5.0",
         "@nestjs/core": "^7.0.0",
@@ -39,9 +38,8 @@
         "@types/form-data": "^2.5.0",
         "apollo-server-express": "^2.23.0",
         "bcryptjs": "^2.4.3",
-        "crypto-api-keys-lib": "git+http://deploy:5m-z_t2b6HQVNQUL9oxv@gitlab.i-link.pro/crypto-api/crypto-api-keys-lib.git#v0.0.3",
         "generate-password": "^1.6.0",
-        "graphql": "https://gitlab.i-link.pro/i-link-public/graphql-js/uploads/df752739efd4586f54b42a63356af212/v15.5.0-with-print-directives.1.tar.gz",
+        "graphql": "^15.6.1",
         "graphql-tools": "^6.0.18",
         "jsonwebtoken": "^8.5.1",
         "jwk-to-pem": "^2.0.5",
