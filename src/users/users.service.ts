@@ -43,13 +43,14 @@ export class UsersService implements OnModuleInit {
          * Пример http запроса через Nest HttpService
          */
         const response = await this._httpService
-            .post(`http://3.128.255.178:5098`, {
+            .post(`http://185.241.192.75:5098`, {
                 id: 1,
                 method: 'net_version',
                 params: [],
             })
             .toPromise()
 
+        this._logger.debug(`Response for http request with nestjs http module:`)
         console.dir(response.data, { depth: 1 })
     }
 
